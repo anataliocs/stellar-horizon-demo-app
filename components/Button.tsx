@@ -20,8 +20,8 @@ const Button = () => {
 
     useStore.setState({ errorMessage: false });
     try {
-      const [accountAddress] = [""];
-      const { data } = await axios.post('/api/auth', { accountAddress });
+      const [accountAddress] = ["GBDZDOGVYFIHTQYUEX43HSG4OMFZZWTLSBCTY7JVV4LQM33VLNAGCIEO"];
+      const { data } = await axios.post('/api/account', { accountAddress });
 
       console.log("Data: ");
       console.log(data);
@@ -63,7 +63,7 @@ const Button = () => {
     if (isAuthenticated) {
       return (
         <button onClick={handleSuccessButtonClick} className={styles.button}>
-          Let's Go
+          Celebrate!
         </button>
       );
     }

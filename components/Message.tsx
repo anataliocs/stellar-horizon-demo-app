@@ -1,4 +1,3 @@
-import { Collectible } from '@audius/fetch-nft';
 import useStore from '../helpers/store';
 import styles from '../styles/Message.module.css';
 import { AccountResponse } from '@stellar/stellar-sdk/lib/horizon';
@@ -26,13 +25,18 @@ const MessageBox = ({ title, errorState, account, children }: MessageBoxProps) =
           {title}
         </h1>
         {account ? (
-    
-            <div className={styles.accessBox}>
-              <span><h5>Access granted to exclusive content: </h5><strong>{account.account_id}</strong></span>
-              <span className='text-[8px]'>NFT ID:{account.account_id}</span>
-            </div>
-          
-          ) : null
+
+          <div className={styles.accessBox}>
+            <span><h5>Account ID: </h5><strong>{account.account_id}</strong></span>
+            {
+              account.balances && account.balances[0] && account.balances[0].balance ?
+                <span><h5>Lumens Balance: </h5><strong>{account.balances[0].balance}</strong></span>
+                : ''
+            }
+
+          </div>
+
+        ) : null
         }
         <div className={styles.text}>{children}</div>
       </div>
@@ -48,38 +52,26 @@ const Message = () => {
   const haveAccountDetails = useStore((state) => state.haveAccountDetails);
   const account = useStore((state) => state.account);
 
-  
-
-  if (walletConnectionAttempted) {
+  if (haveAccountDetails) {
     if (isAuthenticated) {
       return (
         <MessageBox title="Stellar Account" errorState={false} account={account}>
-          <p>Account details</p>
+          <p>Account details retreived!</p>
         </MessageBox>
       );
     }
     return (
       <MessageBox title="Access Denied" errorState={true}>
         <p>
-          You don't have the authorized NFT in your MetaMask Wallet to enable
-          entry. Please check your account for an NFT with the following
-          contract address:
+          You don't have access
         </p>
-        <a
-          className="block mt-4 font-mono text-2xl w-auto rounded-lg outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-[#473F42]"
-          href={`https://etherscan.io/address/${process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}`}
-          target="blank"
-        >
-          {process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}
-        </a>
       </MessageBox>
     );
   }
   return (
-    <MessageBox title="Unlock with NFT">
+    <MessageBox title="Account Details">
       <span>
-        Welcome to the <span className="font-normal">Audius Exclusive Content Section</span>, 
-        where holding specific NFTs grants you special access to exclusive content.
+        Click the button below to get <span className="font-normal">Account Details</span>
       </span>
     </MessageBox>
   );

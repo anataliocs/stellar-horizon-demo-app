@@ -1,7 +1,7 @@
 
 # Stellar Horizon SDK Demonstration
 
-__Goal:__ Limit access to exclusive content only to owners of a specified NFT.
+__Goal:__ Get account details using Stellar Horizon API Javascript SDK
 
 Uses the Stellar Horizon SDK
 
@@ -33,18 +33,15 @@ Create environment variables file
   touch .env
 ```
 
-
-
-## Component Breakdown
+## Components
 
 `pages/index.tsx`
   - Home page Component
   - imports Message.tsx and Button.tsx components
-  - has useEffect that checks on page load if the user has already connected their wallet, and checks for account changes (disconnect wallet, change accounts within wallet)
 
 `pages/api/auth.ts`
   - Next.js API file
-  - Making a `POST` request to `http://localhost:3000/api/auth` will call the 
+  - Making a `POST` request to `http://localhost:3000/api/account` using the Stellar SDK to get account details
 
 `helpers/store.ts`
   - This file sets up our zustand store. [Zustand](https://github.com/pmndrs/zustand) is a "small, fast and scalable bearbones state-management solution using simplified flux principles."

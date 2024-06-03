@@ -8,7 +8,6 @@ import Message from '../components/Message';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import LoadingSpinner from '../components/icons/LoadingSpinner';
-import { Collectible } from '@audius/fetch-nft';
 
 
 const Home: NextPage = () => {
@@ -24,14 +23,15 @@ const Home: NextPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   useStore.setState({ isAuthenticated: true });
   useStore.setState({ walletConnectionAttempted: true });
+  useStore.setState({ walletAddress: "GBDZDOGVYFIHTQYUEX43HSG4OMFZZWTLSBCTY7JVV4LQM33VLNAGCIEO" });
 
   // check if wallet has already been connected and set isAuthenticated accordingly
   useEffect(() => {
 
     const authenticate = async () => {
       try {
-        const [accountAddress] = [""]
-        const { data } = await axios.post('/api/auth', { accountAddress });
+        const [accountAddress] = ["GBDZDOGVYFIHTQYUEX43HSG4OMFZZWTLSBCTY7JVV4LQM33VLNAGCIEO"]
+        const { data } = await axios.post('/api/account', { accountAddress });
         console.log(accountAddress);
 
         useStore.setState({ account: data.account });

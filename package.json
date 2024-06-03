@@ -1,5 +1,5 @@
 {
-  "name": "audius.fetchnft.auth.project.nextjs",
+  "name": "stellar.account.project.nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,16 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@audius/fetch-nft": "^0.1.8",
-    "@solana/spl-token": "^0.3.9",
-    "@solana/web3.js": "^1.87.6",
     "@stellar/stellar-sdk": "^12.0.1",
     "dotenv": "^16.3.1",
     "js-confetti": "^0.10.2",
     "next": "12.1.4",
     "react": "18.0.0",
-    "react-dom": "18.0.0",
-    "web3": "^1.7.1"
+    "react-dom": "18.0.0"
   },
   "devDependencies": {
     "@types/node": "17.0.23",
