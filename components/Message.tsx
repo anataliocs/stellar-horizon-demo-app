@@ -1,15 +1,16 @@
 import { Collectible } from '@audius/fetch-nft';
 import useStore from '../helpers/store';
 import styles from '../styles/Message.module.css';
+import { AccountResponse } from '@stellar/stellar-sdk/lib/horizon';
 
 interface MessageBoxProps {
   title: string;
   errorState?: boolean;
-  solCollectibleArray?: Collectible[];
+  account?: AccountResponse;
   children: React.ReactNode;
 }
 
-const MessageBox = ({ title, errorState, solCollectibleArray, children }: MessageBoxProps) => {
+const MessageBox = ({ title, errorState, account, children }: MessageBoxProps) => {
   return (
     <div
       className={`${styles.outerBox} ${errorState ? 'bg-gradient-border-error-to-t' : 'bg-gradient-border-to-t'
@@ -24,16 +25,14 @@ const MessageBox = ({ title, errorState, solCollectibleArray, children }: Messag
         <h1 className={`${styles.title} ${errorState ? 'text-primary' : ''}`}>
           {title}
         </h1>
-        {solCollectibleArray ? (
-          solCollectibleArray.map(nft =>
-          (
+        {account ? (
+    
             <div className={styles.accessBox}>
-              <span><h5>Access granted to exclusive content: </h5><strong>{nft.name}</strong></span>
-              <img className={styles.nftImage} src={nft.imageUrl} />
-              <span className='text-[8px]'>NFT ID:{nft.id}</span>
+              <span><h5>Access granted to exclusive content: </h5><strong>{account.account_id}</strong></span>
+              <span className='text-[8px]'>NFT ID:{account.account_id}</span>
             </div>
-          )
-          )) : null
+          
+          ) : null
         }
         <div className={styles.text}>{children}</div>
       </div>
@@ -46,12 +45,16 @@ const Message = () => {
     (state) => state.walletConnectionAttempted
   );
   const isAuthenticated = useStore((state) => state.isAuthenticated);
-  const solCollectibles: Collectible[] = useStore<Collectible[]>((state) => state.solCollectibles);
+  const haveAccountDetails = useStore((state) => state.haveAccountDetails);
+  const account = useStore((state) => state.account);
+
+  
 
   if (walletConnectionAttempted) {
     if (isAuthenticated) {
       return (
-        <MessageBox title="Exclusive Content Unlocked!" errorState={false} solCollectibleArray={solCollectibles}>
+        <MessageBox title="Stellar Account" errorState={false} account={account}>
+          <p>Account details</p>
         </MessageBox>
       );
     }

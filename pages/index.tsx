@@ -7,9 +7,9 @@ import StellarLogo from '../components/icons/StellarLogo';
 import Message from '../components/Message';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import Web3 from 'web3';
 import LoadingSpinner from '../components/icons/LoadingSpinner';
 import { Collectible } from '@audius/fetch-nft';
+
 
 const Home: NextPage = () => {
   const walletConnectionAttempted = useStore(
@@ -18,63 +18,34 @@ const Home: NextPage = () => {
   const isAuthenticated = useStore((state) => state.isAuthenticated);
   const walletAddress = useStore((state) => state.walletAddress);
   const errorMessage = useStore((state) => state.errorMessage);
-  const solCollectibles: Collectible[] = useStore<Collectible[]>((state) => state.solCollectibles);
+  const haveAccountDetails = useStore((state) => state.haveAccountDetails);
+  const account = useStore((state) => state.account);
+  
   const [isLoading, setIsLoading] = useState(true);
+  useStore.setState({ isAuthenticated: true });
+  useStore.setState({ walletConnectionAttempted: true });
 
   // check if wallet has already been connected and set isAuthenticated accordingly
   useEffect(() => {
-    let web3: Web3;
-    const { ethereum } = window;
-
-    const handleAccountChanged = (accounts: string[] | null | undefined) => {
-      if (Array.isArray(accounts)) {
-        const [account] = accounts;
-        if (account) {
-          setIsLoading(true);
-          authenticate();
-        } else {
-          window.location.reload();
-        }
-      } else {
-        window.location.reload();
-      }
-    };
 
     const authenticate = async () => {
       try {
-        const [accountAddress] = await web3.eth.getAccounts();
-        if (!accountAddress) {
-          throw new Error('No accounts have been authorized by MetaMask');
-        }
+        const [accountAddress] = [""]
         const { data } = await axios.post('/api/auth', { accountAddress });
-        console.log(data.solCollectibles);
-        useStore.setState({ solCollectibles: data.solCollectibles });
-        useStore.setState({ isAuthenticated: data.isAuthenticated });
-        useStore.setState({ walletConnectionAttempted: true });
+        console.log(accountAddress);
+
+        useStore.setState({ account: data.account });
         useStore.setState({ walletAddress: accountAddress });
+        useStore.setState({ isAuthenticated: true });
+        useStore.setState({ walletConnectionAttempted: true });
       } catch (error) {
-        useStore.setState({ isAuthenticated: false });
-        useStore.setState({ walletConnectionAttempted: false });
+        console.log(error);
       }
 
-      setIsLoading(false);
+      setIsLoading(true);
     };
 
-    if (typeof ethereum !== 'undefined') {
-      web3 = new Web3(Web3.givenProvider);
-      window.ethereum.on('accountsChanged', handleAccountChanged);
-      useStore.setState({ errorMessage: false });
-      authenticate();
-    } else {
-      // show error state for when metamask isn't installed
-      setIsLoading(false);
-      useStore.setState({ errorMessage: true });
-    }
-
     return () => {
-      if (typeof ethereum !== 'undefined') {
-        window.ethereum.removeListener('accountsChanged', handleAccountChanged);
-      }
     };
   }, []);
 
@@ -103,7 +74,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Stellar Hiring Exercise </title>
+        <title>Stellar Account Lookup Example </title>
         <meta
           name="description"
           content="NFT as authentication example project"
@@ -130,7 +101,7 @@ const Home: NextPage = () => {
           )}
         </header>
         <main className={styles.main}>
-          {isLoading ? <LoadingSpinner /> : mainContent()}
+          { mainContent()}
         </main>
       </div>
     </>

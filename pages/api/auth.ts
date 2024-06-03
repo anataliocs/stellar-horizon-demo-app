@@ -1,22 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { FetchNFTClient, Collectible, CollectibleState } from '@audius/fetch-nft';
+import { Horizon, Keypair } from '@stellar/stellar-sdk';
+import { AccountResponse } from '@stellar/stellar-sdk/lib/horizon';
 require('dotenv').config();
 
 interface Data {
   isAuthenticated: boolean;
-  solCollectibles: Collectible[];
+  accountData: string;
+  account: AccountResponse;
 }
 
 interface ResponseError {
   message: string;
 }
 
-interface FetchResponse {
-  solCollectibles: CollectibleState;
-}
-
-const fetchClient = new FetchNFTClient();
-const solWalletAddress: string = process.env.SOL_WALLET_ADDRESS ? process.env.SOL_WALLET_ADDRESS : 'CgEZcNoj98ZW3xN7m6FooiCxfN7nQ69KBHPFejbxe3dW';
+const issuerKeypair = Keypair.fromPublicKey("GBDZDOGVYFIHTQYUEX43HSG4OMFZZWTLSBCTY7JVV4LQM33VLNAGCIEO"); 
+const server = new Horizon.Server("https://horizon-testnet.stellar.org");
 
 export default async function handler(
   req: NextApiRequest,
@@ -28,14 +26,16 @@ export default async function handler(
     });
   }
 
-  var collectibleState: FetchResponse = await fetchClient.getCollectibles({
-    solWallets: [solWalletAddress]
-  });
+  const account: AccountResponse = await server.loadAccount(issuerKeypair.publicKey());
+
+  console.log("Account: ");
+  console.log(account.accountId);
+
+  const accountId:string = account.account_id;
 
   return res.status(200).json({
-    isAuthenticated: collectibleState.solCollectibles['GrWNH9qfwrvoCEoTm65hmnSh4z3CD96SfhtfQY6ZKUfY'] &&
-      collectibleState.solCollectibles['GrWNH9qfwrvoCEoTm65hmnSh4z3CD96SfhtfQY6ZKUfY'].length > 0,
-    solCollectibles: collectibleState.solCollectibles['GrWNH9qfwrvoCEoTm65hmnSh4z3CD96SfhtfQY6ZKUfY']
+    accountData: account.account_id,
+    isAuthenticated: account != null && account != undefined,
+    account: account
   });
-
 }

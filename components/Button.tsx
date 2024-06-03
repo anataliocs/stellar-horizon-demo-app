@@ -10,37 +10,39 @@ const Button = () => {
     (state) => state.walletConnectionAttempted
   );
   const isAuthenticated = useStore((state) => state.isAuthenticated);
+  const haveAccountDetails = useStore((state) => state.haveAccountDetails);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleConnectWallet = async () => {
-    const { ethereum } = window;
+  const getAccountDetails = async () => {
+
     setIsLoading(true);
 
-    if (typeof ethereum !== 'undefined') {
-      useStore.setState({ errorMessage: false });
-      try {
-        const [accountAddress] = await ethereum.request({
-          method: 'eth_requestAccounts',
-        });
-        const { data } = await axios.post('/api/auth', { accountAddress });
-        useStore.setState({ isAuthenticated: data.isAuthenticated });
-        useStore.setState({ walletConnectionAttempted: true });
-        setIsLoading(false);
-      } catch {
-        useStore.setState({ isAuthenticated: false });
-        useStore.setState({ walletConnectionAttempted: true });
-        setIsLoading(false);
-      }
-    } else {
-      useStore.setState({ errorMessage: true });
+    useStore.setState({ errorMessage: false });
+    try {
+      const [accountAddress] = [""];
+      const { data } = await axios.post('/api/auth', { accountAddress });
+
+      console.log("Data: ");
+      console.log(data);
+
+      useStore.setState({ isAuthenticated: data.isAuthenticated });
+      useStore.setState({ walletConnectionAttempted: true });
+      useStore.setState({ haveAccountDetails: true });
+      useStore.setState({ account: data.account });
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
     }
+
     setIsLoading(false);
   };
+
   const handleBackButtonClick = () => {
     useStore.setState({ walletConnectionAttempted: false });
     useStore.setState({ isAuthenticated: false });
   };
+
   const handleSuccessButtonClick = () => {
     const jsConfetti = new JSConfetti();
     jsConfetti.addConfetti({
@@ -57,7 +59,7 @@ const Button = () => {
     );
   }
 
-  if (walletConnectionAttempted) {
+  if (haveAccountDetails) {
     if (isAuthenticated) {
       return (
         <button onClick={handleSuccessButtonClick} className={styles.button}>
@@ -72,8 +74,8 @@ const Button = () => {
     );
   }
   return (
-    <button onClick={handleConnectWallet} className={styles.buttonPrimary}>
-      Connect Wallet
+    <button onClick={getAccountDetails} className={styles.button}>
+      Get Account Details
     </button>
   );
 };
